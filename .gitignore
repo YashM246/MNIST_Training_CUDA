@@ -1,0 +1,30 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# MNIST data
+data/
+**/data/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Build artifacts (for C/CUDA stages)
+*.o
+*.out
+*.exe
+*.so
+*.a
+
+# CUDA
+*.ptx
+*.cubin
+
+# Editor / OS
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
