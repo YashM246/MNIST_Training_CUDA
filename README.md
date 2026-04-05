@@ -9,13 +9,27 @@ A 2-layer MLP (Multi-Layer Perceptron) trained on MNIST, progressively optimized
 A simple 2-layer fully connected network:
 
 ```
-Input (784) → Linear → ReLU → Linear → Softmax → Output (10)
+Input (784) → Linear(784→256) → ReLU → Linear(256→10) → Output (10)
 ```
 
 - **Input:** 28×28 flattened MNIST images (784 features)
-- **Hidden layer:** 128 neurons + ReLU activation
+- **Hidden layer:** 256 neurons + ReLU activation
 - **Output layer:** 10 neurons (one per digit class)
 - **Loss:** Cross-Entropy
+
+---
+
+## Training Details
+
+| Parameter | Value |
+|-----------|-------|
+| Dataset | MNIST (60,000 train / 10,000 test) |
+| Training samples used | 10,000 per epoch |
+| Batch size | 4 |
+| Epochs | 3 |
+| Optimizer | SGD |
+| Learning rate | 1e-3 |
+| Normalization | mean=0.1307, std=0.3081 |
 
 ---
 
@@ -34,15 +48,32 @@ Input (784) → Linear → ReLU → Linear → Softmax → Output (10)
 
 ## Results
 
-| Stage | Time (s/epoch) | Speedup | Final Loss |
-|-------|---------------|---------|------------|
-| PyTorch | — | 1× (baseline) | — |
-| NumPy | — | — | — |
-| C / CPU | — | — | — |
-| Naive CUDA | — | — | — |
-| cuBLAS | — | — | — |
+| Stage | Avg Iter Time | Time / Epoch | Speedup | Final Accuracy |
+|-------|--------------|--------------|---------|----------------|
+| PyTorch (CPU) | ~0.45 ms | ~1.1 s | 1× (baseline) | 90.51% |
+| NumPy | — | — | — | — |
+| C / CPU | — | — | — | — |
+| Naive CUDA | — | — | — | — |
+| cuBLAS | — | — | — | — |
 
-> Table will be updated as each stage is implemented.
+> Iter time is averaged over logged checkpoints (every 500 iters). Epoch time estimated as avg\_iter\_time × iters\_per\_epoch.
+
+---
+
+## Project Structure
+
+```
+MNIST_Training_CUDA/
+├── README.md
+├── requirement.txt
+├── 01_Python/
+│   └── 01_torch_implementation.py   # Stage 1: PyTorch baseline
+├── 02_NumPy/                        # Stage 2: NumPy (coming)
+├── 03_C_CPU/                        # Stage 3: C/CPU (coming)
+├── 04_CUDA_Naive/                   # Stage 4: Naive CUDA kernels (coming)
+├── 05_cuBLAS/                       # Stage 5: cuBLAS optimized (coming)
+└── data/                            # MNIST dataset (auto-downloaded, gitignored)
+```
 
 ---
 
@@ -65,29 +96,3 @@ For CUDA stages, you will need:
 - CUDA Toolkit (nvcc)
 - A CUDA-capable GPU
 - cuBLAS (included with CUDA Toolkit)
-
----
-
-## Project Structure
-
-```
-MNIST_Training_CUDA/
-├── README.md
-├── requirement.txt
-├── pytorch/          # Stage 1: PyTorch baseline
-├── numpy/            # Stage 2: NumPy implementation
-├── c_cpu/            # Stage 3: C/CPU implementation
-├── cuda_naive/       # Stage 4: Naive CUDA kernels
-├── cuda_cublas/      # Stage 5: cuBLAS optimized
-└── data/             # MNIST dataset (auto-downloaded)
-```
-
----
-
-## Training Details
-
-- **Dataset:** MNIST (60,000 train / 10,000 test)
-- **Optimizer:** SGD (or equivalent manual update)
-- **Learning rate:** TBD per stage
-- **Epochs:** TBD
-- **Batch size:** TBD
