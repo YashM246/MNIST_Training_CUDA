@@ -52,7 +52,7 @@ Input (784) → Linear(784→256) → ReLU → Linear(256→10) → Output (10)
 |-------|--------------|--------------|---------|----------------|
 | PyTorch (CPU) | ~0.45 ms | ~1.1 s | 1× (baseline) | 90.51% |
 | NumPy | — | — | — | — |
-| C / CPU | — | — | — | — |
+| C / CPU | — | ~1.87 s | 0.59× | 88.90% |
 | Naive CUDA | — | — | — | — |
 | cuBLAS | — | — | — | — |
 
@@ -69,7 +69,9 @@ MNIST_Training_CUDA/
 ├── 01_Python/
 │   └── 01_torch_implementation.py   # Stage 1: PyTorch baseline
 ├── 02_NumPy/                        # Stage 2: NumPy (coming)
-├── 03_C_CPU/                        # Stage 3: C/CPU (coming)
+├── 02_C/                            # Stage 3: C/CPU implementation
+│   ├── naive_cpu.c
+│   └── export_data.py               # Exports MNIST to binary for C
 ├── 04_CUDA_Naive/                   # Stage 4: Naive CUDA kernels (coming)
 ├── 05_cuBLAS/                       # Stage 5: cuBLAS optimized (coming)
 └── data/                            # MNIST dataset (auto-downloaded, gitignored)
