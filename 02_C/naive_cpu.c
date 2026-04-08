@@ -35,9 +35,9 @@ double get_time_diff(struct timespec start, struct timespec end){
 #define OUTPUT_SIZE 10
 #define TRAIN_SIZE 10000
 #define TEST_SIZE 1000
-#define BATCH_SIZE 32
-#define EPOCHS 10
-#define LR 0.01
+#define BATCH_SIZE 4
+#define EPOCHS 3
+#define LR 0.001
 
 typedef struct{
     float *weights1;
@@ -463,6 +463,39 @@ void initialize_neural_network(NeuralNetwork *nn) {
     initialize_random_weights(nn);
 }
 
+void evaluate(NeuralNetwork *nn, float *X_test, int *y_test) {
+    float *hidden = malloc(BATCH_SIZE * HIDDEN_SIZE * sizeof(float));
+    float *output = malloc(BATCH_SIZE * OUTPUT_SIZE * sizeof(float));
+    TimingStats dummy = {0};
+
+    int correct = 0;
+    int num_batches = TEST_SIZE / BATCH_SIZE;
+
+    for (int batch = 0; batch < num_batches; batch++) {
+        float *batch_input = &X_test[batch * BATCH_SIZE * INPUT_SIZE];
+        int *batch_labels = &y_test[batch * BATCH_SIZE];
+
+        forward_timed(nn, batch_input, hidden, output, BATCH_SIZE, &dummy);
+
+        for (int b = 0; b < BATCH_SIZE; b++) {
+            int predicted = 0;
+            float max_val = output[b * OUTPUT_SIZE];
+            for (int i = 1; i < OUTPUT_SIZE; i++) {
+                if (output[b * OUTPUT_SIZE + i] > max_val) {
+                    max_val = output[b * OUTPUT_SIZE + i];
+                    predicted = i;
+                }
+            }
+            if (predicted == batch_labels[b]) correct++;
+        }
+    }
+
+    printf("Test Accuracy: %.2f%%\n", 100.0f * correct / (num_batches * BATCH_SIZE));
+
+    free(hidden);
+    free(output);
+}
+
 int main() {
     srand(time(NULL));  // Random seed for natural variance
 
@@ -483,6 +516,7 @@ int main() {
 
 
     train_timed(&nn, X_train, y_train);
+    evaluate(&nn, X_test, y_test);
 
     free(nn.weights1);
     free(nn.weights2);
